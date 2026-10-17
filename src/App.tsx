@@ -4,7 +4,7 @@ import AppLayout from "./components/layout/AppLayout";
 import DashboardPage from "./pages/DashboardPage";
 import SalesPage from "./pages/SalesPage";
 import SettlementsPage from "./pages/SettlementsPage";
-import ReconciliationPage from "./pages/ReconcilitationPage";
+import ReconciliationPage from "./pages/ReconciliationPage";
 import ExpensesPage from "./pages/ExpensesPage";
 
 function App() {
