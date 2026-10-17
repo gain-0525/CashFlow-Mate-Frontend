@@ -18,3 +18,31 @@ export const getSettlements = async (): Promise<Settlement[]> => {
 
   return response.data;
 };
+
+export interface CreateSettlementRequest {
+  transactionId: string;
+  settlementDate: string;
+  grossAmount: number;
+  feeAmount: number;
+  netAmount: number;
+  status: string;
+}
+
+export const createSettlement = async (
+  data: CreateSettlementRequest,
+): Promise<Settlement> => {
+  const response = await apiClient.post<Settlement>("/api/settlements", data);
+
+  return response.data;
+};
+
+export const uploadSettlementsCsv = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await apiClient.post<string>(
+    "/api/uploads/settlements",
+    formData,
+  );
+  return response.data;
+};
