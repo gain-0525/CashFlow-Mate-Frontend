@@ -9,8 +9,21 @@ export interface Sale {
   uploadBatchId: number | null;
 }
 
+export interface CreateSaleRequest {
+  transactionId: string;
+  saleDate: string;
+  amount: number;
+  paymentMethod: string;
+}
+
 export const getSales = async (): Promise<Sale[]> => {
   const response = await apiClient.get<Sale[]>("/api/sales");
+
+  return response.data;
+};
+
+export const createSale = async (data: CreateSaleRequest): Promise<Sale> => {
+  const response = await apiClient.post<Sale>("/api/sales", data);
 
   return response.data;
 };

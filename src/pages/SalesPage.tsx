@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 
-import { getSales } from "../api/sales";
-import type { Sale } from "../api/sales";
+import { getSales, createSale } from "../api/sales";
+import type { Sale, CreateSaleRequest } from "../api/sales";
+import SaleForm from "../components/sales/SaleForm";
 
 export default function SalesPage() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isFormOpen, setIsFormOpen] = useState(false);
 
   useEffect(() => {
     const fetchSales = async () => {
@@ -30,14 +32,31 @@ export default function SalesPage() {
     sale.transactionId.toLowerCase().includes(searchQuery.trim().toLowerCase()),
   );
 
+  const handleCreateSale = async (data: CreateSaleRequest) => {
+    const newSale = await createSale(data);
+
+    setSales((prev) => [...prev, newSale]);
+    setIsFormOpen(false);
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-[#17213B]">매출 관리</h1>
-        <p className="mt-2 text-sm text-[#8190B0]">
-          등록된 매출 내역을 확인하세요.
-        </p>
+      <div className="flex items-center justify-between gap-4">
+        <button
+          type="button"
+          onClick={() => setIsFormOpen(true)}
+          className="rounded-xl bg-[#5675FF] px-5 py-3 text-sm font-medium text-white"
+        >
+          매출 등록
+        </button>
       </div>
+
+      {isFormOpen && (
+        <SaleForm
+          onSubmit={handleCreateSale}
+          onCancel={() => setIsFormOpen(false)}
+        />
+      )}
 
       {isLoading ? (
         <p>매출 데이터를 불러오는 중입니다...</p>
