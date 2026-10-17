@@ -27,3 +27,21 @@ export const createSale = async (data: CreateSaleRequest): Promise<Sale> => {
 
   return response.data;
 };
+
+export const uploadSalesCsv = async (file: File): Promise<string> => {
+  const formData = new FormData();
+
+  formData.append("file", file);
+
+  const response = await apiClient.post<string>(
+    "/api/uploads/sales",
+    formData,
+    {
+      headers: {
+        "Content-Type": undefined,
+      },
+    },
+  );
+
+  return response.data;
+};

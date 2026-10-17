@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getSales, createSale } from "../api/sales";
 import type { Sale, CreateSaleRequest } from "../api/sales";
 import SaleForm from "../components/sales/SaleForm";
+import SalesCsvUpload from "../components/sales/SalesCsvUpload";
 
 export default function SalesPage() {
   const [sales, setSales] = useState<Sale[]>([]);
@@ -10,6 +11,7 @@ export default function SalesPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState("");
 
   useEffect(() => {
     const fetchSales = async () => {
@@ -39,17 +41,35 @@ export default function SalesPage() {
     setIsFormOpen(false);
   };
 
+  const handleUploadSuccess = async () => {
+    const data = await getSales();
+    setSales(data);
+    setUploadMessage("매출 CSV 업로드가 완료되었습니다.");
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        <SalesCsvUpload onUploadSuccess={handleUploadSuccess} />
+
         <button
           type="button"
           onClick={() => setIsFormOpen(true)}
-          className="rounded-xl bg-[#5675FF] px-5 py-3 text-sm font-medium text-white"
+          className="rounded-xl bg-[#5675FF] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4564E8]"
         >
           매출 등록
         </button>
       </div>
+
+      {uploadMessage && (
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-xl border border-[#D7E9DD] bg-[#F0FDF4] px-4 py-3 text-sm font-medium text-[#15803D]"
+        >
+          <span>✓</span>
+          <span>{uploadMessage}</span>
+        </div>
+      )}
 
       {isFormOpen && (
         <SaleForm
