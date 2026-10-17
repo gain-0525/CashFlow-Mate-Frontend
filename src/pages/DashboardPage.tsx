@@ -1,9 +1,34 @@
+import { useEffect, useState } from "react";
 import { AlertCircle, ArrowDownToLine, TrendingUp, Wallet } from "lucide-react";
 
 import SummaryCard from "../components/dashboard/SummaryCard";
 import CashFlowChart from "../components/dashboard/CashFlowChart";
+import { getForecast, type Forecast } from "../api/forecast";
 
 export default function DashboardPage() {
+  const [forecast, setForecast] = useState<Forecast[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchForecast = async () => {
+      try {
+        const data = await getForecast();
+        setForecast(data);
+      } catch (error) {
+        console.error("현금흐름 예측 조회 실패:", error);
+        setError("현금흐름 예측 데이터를 불러오지 못했습니다.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchForecast();
+  }, []);
+
+  const chartData = forecast.map((item) => ({
+    date: item.date.slice(5).replace("-", "/"),
+    balance: item.projectedBalance,
+  }));
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
@@ -32,23 +57,30 @@ export default function DashboardPage() {
 
         <SummaryCard
           title="예상 잔액"
-          value="₩8,400,000"
-          description="향후 현금흐름 예측"
+          value={
+            forecast.length > 0
+              ? `₩${forecast[forecast.length - 1].projectedBalance.toLocaleString("ko-KR")}`
+              : "-"
+          }
+          description="예측 기간 마지막 날의 잔액"
           icon={Wallet}
           iconColor="#10B981"
         />
       </div>
 
-      <CashFlowChart data={mockForecast} />
+      {isLoading ? (
+        <p className="text-sm text-[#8190B0]">
+          현금흐름 데이터를 불러오던 중입니다...
+        </p>
+      ) : error ? (
+        <p className="text-sm text-red-500">{error}</p>
+      ) : forecast.length === 0 ? (
+        <p className="text-sm text-[#8190B0]">
+          현금흐름 예측 데이터가 없습니다.
+        </p>
+      ) : (
+        <CashFlowChart data={chartData} />
+      )}
     </div>
   );
 }
-
-const mockForecast = Array.from({ length: 30 }, (_, index) => {
-  const date = new Date(2026, 9, 17 + index);
-
-  return {
-    date: `${date.getMonth() + 1}/${date.getDate()}`,
-    balance: 8000000 + index * 120000 + Math.sin(index / 3) * 500000,
-  };
-});
