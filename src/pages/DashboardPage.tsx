@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { AlertCircle, ArrowDownToLine, TrendingUp, Wallet } from "lucide-react";
+import { getSales, type Sale } from "../api/sales";
+import { getSettlements, type Settlement } from "../api/settlements";
 
 import SummaryCard from "../components/dashboard/SummaryCard";
 import CashFlowChart from "../components/dashboard/CashFlowChart";
@@ -9,6 +11,8 @@ export default function DashboardPage() {
   const [forecast, setForecast] = useState<Forecast[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [sales, setSales] = useState<Sale[]>([]);
+  const [settlements, setSettlements] = useState<Settlement[]>([]);
 
   useEffect(() => {
     const fetchForecast = async () => {
@@ -25,23 +29,60 @@ export default function DashboardPage() {
     fetchForecast();
   }, []);
 
+  useEffect(() => {
+    const fetchSales = async () => {
+      try {
+        const data = await getSales();
+        setSales(data);
+      } catch (error) {
+        console.error("매출 조회 실패:", error);
+      }
+    };
+    fetchSales();
+  }, []);
+
+  useEffect(() => {
+    const fetchSettlements = async () => {
+      try {
+        const data = await getSettlements();
+        setSettlements(data);
+      } catch (error) {
+        console.error("정산 조회 실패:", error);
+      }
+    };
+    fetchSettlements();
+  }, []);
+
   const chartData = forecast.map((item) => ({
     date: item.date.slice(5).replace("-", "/"),
     balance: item.projectedBalance,
   }));
+
+  const totalSales = sales.reduce((sum, sale) => sum + sale.amount, 0);
+  const totalSettlements = settlements.reduce(
+    (sum, settlement) => sum + settlement.netAmount,
+    0,
+  );
+
+  const mismatchCount = settlements.filter(
+    (settlements) =>
+      settlements.validationStatus === "AMOUNT_MISMATCH" ||
+      settlements.validationStatus === "MISSING_SALE",
+  ).length;
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
           title="총 매출"
-          value="₩12,500,000"
+          value={`₩${totalSales.toLocaleString("ko-KR")}`}
           description="등록된 매출 합계"
           icon={TrendingUp}
         />
 
         <SummaryCard
           title="총 정산액"
-          value="₩11,800,000"
+          value={`₩${totalSettlements.toLocaleString("ko-KR")}`}
           description="등록된 정산 금액 합계"
           icon={ArrowDownToLine}
           iconColor="#8B5CF6"
@@ -49,7 +90,7 @@ export default function DashboardPage() {
 
         <SummaryCard
           title="정산 불일치"
-          value="3건"
+          value={`${mismatchCount}건`}
           description="확인이 필요한 정산 내역"
           icon={AlertCircle}
           iconColor="#F59E0B"
