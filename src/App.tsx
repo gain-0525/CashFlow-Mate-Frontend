@@ -6,6 +6,7 @@ import SalesPage from "./pages/SalesPage";
 import SettlementsPage from "./pages/SettlementsPage";
 import ReconciliationPage from "./pages/ReconciliationPage";
 import ExpensesPage from "./pages/ExpensesPage";
+import ForecastPage from "./pages/ForecastPage";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/settlements" element={<SettlementsPage />} />
           <Route path="/reconciliation" element={<ReconciliationPage />} />
           <Route path="/expenses" element={<ExpensesPage />} />
+          <Route path="/forecast" element={<ForecastPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
