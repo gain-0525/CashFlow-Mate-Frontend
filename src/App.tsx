@@ -1,8 +1,25 @@
+import { BrowserRouter, Routes, Route } from "react-router";
+
+import AppLayout from "./components/layout/AppLayout";
+import DashboardPage from "./pages/DashboardPage";
+import SalesPage from "./pages/SalesPage";
+import SettlementsPage from "./pages/SettlementsPage";
+import ReconciliationPage from "./pages/ReconciliationPage";
+import ExpensesPage from "./pages/ExpensesPage";
+
 function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-100">
-      <h1 className="text-3xl font-bold text-blue-600">CashFlow Mate</h1>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/sales" element={<SalesPage />} />
+          <Route path="/settlements" element={<SettlementsPage />} />
+          <Route path="/reconciliation" element={<ReconciliationPage />} />
+          <Route path="/expenses" element={<ExpensesPage />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
