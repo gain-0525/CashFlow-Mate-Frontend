@@ -8,6 +8,7 @@ import {
   ReceiptText,
   Wallet,
   X,
+  TrendingUp,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router";
@@ -22,6 +23,7 @@ const menus = [
     icon: FileCheck2,
   },
   { path: "/expenses", label: "지출 관리", icon: ReceiptText },
+  { path: "/forecast", label: "현금흐름 예측", icon: TrendingUp },
 ];
 
 const pageDescriptions: Record<string, string> = {
@@ -30,6 +32,7 @@ const pageDescriptions: Record<string, string> = {
   "/settlements": "정산 내역과 수수료를 확인하세요.",
   "/reconciliation": "매출과 정산 데이터의 불일치 항목을 확인하세요.",
   "/expenses": "사업 운영에 필요한 지출을 관리하세요.",
+  "/forecast": "예상 수입과 지출을 분석해 미래 잔액과 자금 위험을 확인하세요.",
 };
 
 export default function AppLayout() {
