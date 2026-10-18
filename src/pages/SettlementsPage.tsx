@@ -10,6 +10,7 @@ import {
 } from "../api/settlements";
 import SettlementForm from "../components/settlements/SettlementForm";
 import SettlementsCsvUpload from "../components/settlements/SettlementCsvUpload";
+import { Download } from "lucide-react";
 
 const validationLabels: Record<string, string> = {
   MATCHED: "일치",
@@ -112,6 +113,14 @@ export default function SettlementsPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-end gap-3">
+        <a
+          href="/templates/settlements-template.csv"
+          download="settlements-template.csv"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#E8ECF6] bg-white px-5 py-3 text-sm font-semibold text-[#3156D3] transition-colors hover:bg-[#F5F7FF]"
+        >
+          <Download size={17} />
+          CSV 양식 다운로드
+        </a>
         <SettlementsCsvUpload
           onUploadSuccess={handleUploadSuccess}
           onUploadError={(message) => setUploadMessage(message)}

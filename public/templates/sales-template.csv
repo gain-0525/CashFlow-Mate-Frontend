@@ -1,0 +1,2 @@
+transaction_id,sale_date,amount,payment_method
+TXN_SAMPLE_001,2026-10-18,100000,CARD

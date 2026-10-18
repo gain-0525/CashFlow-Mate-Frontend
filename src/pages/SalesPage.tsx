@@ -4,6 +4,7 @@ import { getSales, createSale, updateSale, deleteSale } from "../api/sales";
 import type { Sale, CreateSaleRequest } from "../api/sales";
 import SaleForm from "../components/sales/SaleForm";
 import SalesCsvUpload from "../components/sales/SalesCsvUpload";
+import { Download } from "lucide-react";
 
 export default function SalesPage() {
   const [sales, setSales] = useState<Sale[]>([]);
@@ -80,8 +81,20 @@ export default function SalesPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-end gap-3">
+        {/* CSV 양식 다운로드 */}
+        <a
+          href="/templates/sales-template.csv"
+          download="sales-template.csv"
+          className="inline-flex items-center gap-2 rounded-xl border border-[#E8ECF6] bg-white px-5 py-3 text-sm font-semibold text-[#3156D3] transition-colors hover:bg-[#F5F7FF]"
+        >
+          <Download size={17} />
+          CSV 양식 다운로드
+        </a>
+
+        {/* CSV 업로드 */}
         <SalesCsvUpload onUploadSuccess={handleUploadSuccess} />
 
+        {/* 매출 등록 */}
         <button
           type="button"
           onClick={() => {
