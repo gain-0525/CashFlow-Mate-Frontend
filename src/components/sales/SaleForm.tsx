@@ -1,20 +1,28 @@
 import { useState } from "react";
+import type { Sale, CreateSaleRequest } from "../../api/sales";
 
 interface SaleFormProps {
-  onSubmit: (data: {
-    transactionId: string;
-    saleDate: string;
-    amount: number;
-    paymentMethod: string;
-  }) => Promise<void>;
+  initialData?: Sale;
+  onSubmit: (data: CreateSaleRequest) => Promise<void>;
   onCancel: () => void;
 }
 
-export default function SaleForm({ onSubmit, onCancel }: SaleFormProps) {
-  const [transactionId, setTransactionId] = useState("");
-  const [saleDate, setSaleDate] = useState("");
-  const [amount, setAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("CARD");
+export default function SaleForm({
+  onSubmit,
+  onCancel,
+  initialData,
+}: SaleFormProps) {
+  const isEditMode = !!initialData;
+  const [transactionId, setTransactionId] = useState(
+    initialData?.transactionId ?? "",
+  );
+  const [saleDate, setSaleDate] = useState(initialData?.saleDate ?? "");
+  const [amount, setAmount] = useState(
+    initialData ? String(initialData.amount) : "",
+  );
+  const [paymentMethod, setPaymentMethod] = useState(
+    initialData?.paymentMethod ?? "CARD",
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -39,7 +47,9 @@ export default function SaleForm({ onSubmit, onCancel }: SaleFormProps) {
         paymentMethod,
       });
     } catch {
-      setError("매출 등록에 실패했습니다.");
+      setError(
+        isEditMode ? "매출 수정에 실패했습니다." : "매출 등록에 실패했습니다.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -50,7 +60,9 @@ export default function SaleForm({ onSubmit, onCancel }: SaleFormProps) {
       onSubmit={handleSubmit}
       className="space-y-4 rounded-2xl border border-[#EDF0F8] bg-white p-6"
     >
-      <h2 className="text-lg font-semibold">매출 등록</h2>
+      <h2 className="text-lg font-semibold">
+        {isEditMode ? "매출 수정" : "매출 등록"}
+      </h2>
 
       <div>
         <label htmlFor="transactionId" className="mb-2 block text-sm">
@@ -126,7 +138,13 @@ export default function SaleForm({ onSubmit, onCancel }: SaleFormProps) {
           disabled={isSubmitting}
           className="rounded-xl bg-[#5675FF] px-5 py-3 text-white disabled:opacity-50"
         >
-          {isSubmitting ? "등록 중..." : "매출 등록"}
+          {isSubmitting
+            ? isEditMode
+              ? "수정 중..."
+              : "등록 중..."
+            : isEditMode
+              ? "매출 수정"
+              : "매출 등록"}
         </button>
       </div>
     </form>

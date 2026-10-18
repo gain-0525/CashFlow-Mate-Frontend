@@ -45,3 +45,15 @@ export const uploadSalesCsv = async (file: File): Promise<string> => {
 
   return response.data;
 };
+
+export const updateSale = async (
+  id: number,
+  data: CreateSaleRequest,
+): Promise<Sale> => {
+  const response = await apiClient.put<Sale>(`/api/sales/${id}`, data);
+  return response.data;
+};
+
+export const deleteSale = async (id: number): Promise<void> => {
+  await apiClient.delete(`/api/sales/${id}`);
+};

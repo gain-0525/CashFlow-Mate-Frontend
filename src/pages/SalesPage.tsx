@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { getSales, createSale } from "../api/sales";
+import { getSales, createSale, updateSale, deleteSale } from "../api/sales";
 import type { Sale, CreateSaleRequest } from "../api/sales";
 import SaleForm from "../components/sales/SaleForm";
 import SalesCsvUpload from "../components/sales/SalesCsvUpload";
@@ -12,6 +12,7 @@ export default function SalesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [uploadMessage, setUploadMessage] = useState("");
+  const [editingSale, setEditingSale] = useState<Sale | null>(null);
 
   useEffect(() => {
     const fetchSales = async () => {
@@ -47,6 +48,35 @@ export default function SalesPage() {
     setUploadMessage("매출 CSV 업로드가 완료되었습니다.");
   };
 
+  const handleUpdateSale = async (data: CreateSaleRequest) => {
+    if (!editingSale) return;
+
+    const updatedSale = await updateSale(editingSale.id, data);
+
+    setSales((prev) =>
+      prev.map((sale) => (sale.id === updatedSale.id ? updatedSale : sale)),
+    );
+
+    setEditingSale(null);
+    setIsFormOpen(false);
+  };
+
+  const handleDeleteSale = async (sale: Sale) => {
+    const isConfirmed = window.confirm(
+      `${sale.transactionId} 매출을 삭제하시겠습니까?`,
+    );
+
+    if (!isConfirmed) return;
+
+    try {
+      await deleteSale(sale.id);
+
+      setSales((prev) => prev.filter((item) => item.id !== sale.id));
+    } catch {
+      window.alert("매출 삭제에 실패했습니다.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-end gap-3">
@@ -54,7 +84,10 @@ export default function SalesPage() {
 
         <button
           type="button"
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => {
+            setEditingSale(null);
+            setIsFormOpen(true);
+          }}
           className="rounded-xl bg-[#5675FF] px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#4564E8]"
         >
           매출 등록
@@ -73,8 +106,13 @@ export default function SalesPage() {
 
       {isFormOpen && (
         <SaleForm
-          onSubmit={handleCreateSale}
-          onCancel={() => setIsFormOpen(false)}
+          key={editingSale?.id ?? "create"}
+          initialData={editingSale ?? undefined}
+          onSubmit={editingSale ? handleUpdateSale : handleCreateSale}
+          onCancel={() => {
+            setIsFormOpen(false);
+            setEditingSale(null);
+          }}
         />
       )}
 
@@ -119,6 +157,7 @@ export default function SalesPage() {
                   <th className="px-6 py-4">매출일</th>
                   <th className="px-6 py-4">결제수단</th>
                   <th className="px-6 py-4 text-right">매출액</th>
+                  <th className="px-6 py-4 text-center">관리</th>
                 </tr>
               </thead>
 
@@ -130,6 +169,29 @@ export default function SalesPage() {
                     <td className="px-6 py-4">{sale.paymentMethod}</td>
                     <td className="px-6 py-4 text-right font-semibold">
                       ₩{sale.amount.toLocaleString("ko-KR")}
+                    </td>
+
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingSale(sale);
+                            setIsFormOpen(true);
+                          }}
+                          className="rounded-lg border border-[#DDE4F0] px-3 py-2 text-sm font-medium text-[#5675FF] hover:bg-[#F5F7FF]"
+                        >
+                          수정
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSale(sale)}
+                          className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50"
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
