@@ -2,6 +2,7 @@ import type { Reconciliation } from "../../api/reconciliation";
 
 interface Props {
   reconciliations: Reconciliation[];
+  onResolve: (item: Reconciliation) => void;
 }
 
 const statusLabels: Record<string, string> = {
@@ -22,7 +23,10 @@ const formatAmount = (amount: number | null) => {
   return amount === null ? "-" : `₩${amount.toLocaleString("ko-KR")}`;
 };
 
-export default function ReconciliationTable({ reconciliations }: Props) {
+export default function ReconciliationTable({
+  reconciliations,
+  onResolve,
+}: Props) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-[#EDF0F8] bg-white">
       <div className="p-6">
@@ -37,6 +41,7 @@ export default function ReconciliationTable({ reconciliations }: Props) {
             <th className="px-6 py-4 text-right">금액 차이</th>
             <th className="px-6 py-4 text-right">정산 기준액</th>
             <th className="px-6 py-4">대조 결과</th>
+            <th className="px-6 py-4 text-center">관리</th>
           </tr>
         </thead>
 
@@ -65,6 +70,20 @@ export default function ReconciliationTable({ reconciliations }: Props) {
                 >
                   {statusLabels[item.validationStatus]}
                 </span>
+              </td>
+
+              <td className="px-6 py-4 text-center">
+                {item.validationStatus !== "MATCHED" ? (
+                  <button
+                    type="button"
+                    onClick={() => onResolve(item)}
+                    className="whitespace-nowrap rounded-lg border border-[#DDE4F0] px-3 py-2 text-sm font-medium text-[#5675FF] transition-colors hover:bg-[#F5F7FF]"
+                  >
+                    문제 해결
+                  </button>
+                ) : (
+                  <span className="text-[#8190B0]">-</span>
+                )}
               </td>
             </tr>
           ))}

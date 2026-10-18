@@ -8,6 +8,7 @@ import type {
 
 interface SettlementFormProps {
   initialData?: Settlement;
+  defaultTransactionId?: string;
   onSubmit: (data: CreateSettlementRequest) => Promise<void>;
   onCancel: () => void;
 }
@@ -16,11 +17,12 @@ export default function SettlementForm({
   initialData,
   onSubmit,
   onCancel,
+  defaultTransactionId,
 }: SettlementFormProps) {
   const isEditMode = !!initialData;
 
   const [transactionId, setTransactionId] = useState(
-    initialData?.transactionId ?? "",
+    initialData?.transactionId ?? defaultTransactionId ?? "",
   );
 
   const [settlementDate, setSettlementDate] = useState(

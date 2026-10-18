@@ -6,6 +6,13 @@ import {
   type ValidationStatus,
 } from "../api/reconciliation";
 
+import {
+  createSettlement,
+  type CreateSettlementRequest,
+} from "../api/settlements";
+
+import SettlementForm from "../components/settlements/SettlementForm";
+
 import ReconciliationSummary from "../components/reconciliation/ReconciliationSummary";
 import ReconciliationTable from "../components/reconciliation/ReconciliationTable";
 import ReconciliationAnalysis from "../components/reconciliation/ReconciliationAnalysis";
@@ -26,6 +33,8 @@ export default function ReconciliationPage() {
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterStatus>("ALL");
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedReconciliation, setSelectedReconciliation] =
+    useState<Reconciliation | null>(null);
 
   useEffect(() => {
     const fetchReconciliation = async () => {
@@ -52,6 +61,23 @@ export default function ReconciliationPage() {
 
     return matchesFilter && matchesSearch;
   });
+
+  const handleResolve = (item: Reconciliation) => {
+    console.log("문제 해결 버튼 클릭:", item);
+    console.log("대조 상태:", item.validationStatus);
+    setSelectedReconciliation(item);
+  };
+
+  const handleCreateMissingSettlement = async (
+    data: CreateSettlementRequest,
+  ) => {
+    await createSettlement(data);
+
+    const updatedReconciliations = await getReconciliation();
+    setReconciliations(updatedReconciliations);
+
+    setSelectedReconciliation(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -91,7 +117,37 @@ export default function ReconciliationPage() {
             />
           </div>
 
-          <ReconciliationTable reconciliations={filteredReconciliations} />
+          {selectedReconciliation?.validationStatus ===
+            "MISSING_SETTLEMENT" && (
+            <div className="rounded-2xl border border-[#DDE4FF] bg-[#F8FAFF] p-5">
+              <div className="mb-4">
+                <h2 className="text-lg font-bold text-[#17213B]">
+                  정산 누락 해결
+                </h2>
+                <p className="mt-1 text-sm text-[#8190B0]">
+                  거래 ID {selectedReconciliation.transactionId}에 해당하는 정산
+                  데이터를 등록해 주세요.
+                </p>
+                <p className="mt-1 text-sm text-[#8190B0]">
+                  기존 매출액: ₩
+                  {selectedReconciliation.saleAmount?.toLocaleString("ko-KR") ??
+                    "-"}
+                </p>
+              </div>
+
+              <SettlementForm
+                key={selectedReconciliation.transactionId}
+                defaultTransactionId={selectedReconciliation.transactionId}
+                onSubmit={handleCreateMissingSettlement}
+                onCancel={() => setSelectedReconciliation(null)}
+              />
+            </div>
+          )}
+
+          <ReconciliationTable
+            reconciliations={filteredReconciliations}
+            onResolve={handleResolve}
+          />
         </>
       )}
     </div>
