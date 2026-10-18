@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { getSales, createSale, updateSale, deleteSale } from "../api/sales";
-import type { Sale, CreateSaleRequest } from "../api/sales";
+import type { Sale, CreateSaleRequest, UploadResult } from "../api/sales";
 import SaleForm from "../components/sales/SaleForm";
 import SalesCsvUpload from "../components/sales/SalesCsvUpload";
 import { Download } from "lucide-react";
@@ -12,8 +12,8 @@ export default function SalesPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [uploadMessage, setUploadMessage] = useState("");
   const [editingSale, setEditingSale] = useState<Sale | null>(null);
+  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
 
   useEffect(() => {
     const fetchSales = async () => {
@@ -46,7 +46,6 @@ export default function SalesPage() {
   const handleUploadSuccess = async () => {
     const data = await getSales();
     setSales(data);
-    setUploadMessage("매출 CSV 업로드가 완료되었습니다.");
   };
 
   const handleUpdateSale = async (data: CreateSaleRequest) => {
@@ -92,7 +91,10 @@ export default function SalesPage() {
         </a>
 
         {/* CSV 업로드 */}
-        <SalesCsvUpload onUploadSuccess={handleUploadSuccess} />
+        <SalesCsvUpload
+          onUploadSuccess={handleUploadSuccess}
+          onUploadResult={setUploadResult}
+        />
 
         {/* 매출 등록 */}
         <button
@@ -107,14 +109,79 @@ export default function SalesPage() {
         </button>
       </div>
 
-      {uploadMessage && (
-        <div
-          role="status"
-          className="flex items-center gap-2 rounded-xl border border-[#D7E9DD] bg-[#F0FDF4] px-4 py-3 text-sm font-medium text-[#15803D]"
-        >
-          <span>✓</span>
-          <span>{uploadMessage}</span>
-        </div>
+      {uploadResult && (
+        <section className="rounded-2xl border border-[#EDF0F8] bg-white p-6">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-lg font-bold text-[#17213B]">
+                CSV 업로드 결과
+              </h2>
+              <p className="mt-1 text-sm text-[#8190B0]">
+                {uploadResult.fileName}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setUploadResult(null)}
+              className="text-sm text-[#8190B0] hover:text-[#17213B]"
+            >
+              닫기 ✕
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="rounded-xl bg-[#F8FAFF] p-4">
+              <p className="text-sm text-[#8190B0]">전체 데이터</p>
+              <p className="mt-2 text-2xl font-bold text-[#17213B]">
+                {uploadResult.totalRows}건
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-[#F0FDF4] p-4">
+              <p className="text-sm text-[#15803D]">성공</p>
+              <p className="mt-2 text-2xl font-bold text-[#15803D]">
+                {uploadResult.successRows}건
+              </p>
+            </div>
+
+            <div className="rounded-xl bg-[#FFF5F5] p-4">
+              <p className="text-sm text-[#DC2626]">실패</p>
+              <p className="mt-2 text-2xl font-bold text-[#DC2626]">
+                {uploadResult.errorRows}건
+              </p>
+            </div>
+          </div>
+
+          {uploadResult.errors.length > 0 && (
+            <div className="mt-6">
+              <h3 className="mb-3 text-sm font-semibold text-[#DC2626]">
+                오류 상세 ({uploadResult.errors.length}건)
+              </h3>
+
+              <div className="overflow-hidden rounded-xl border border-[#EDF0F8]">
+                {uploadResult.errors.map((error, index) => (
+                  <div
+                    key={`${error.rowNumber}-${index}`}
+                    className="flex flex-col gap-1 border-b border-[#EDF0F8] px-4 py-3 last:border-b-0 sm:flex-row sm:gap-4"
+                  >
+                    <span className="shrink-0 text-sm font-semibold text-[#DC2626]">
+                      {error.rowNumber}행
+                    </span>
+
+                    <span className="shrink-0 text-xs text-[#8190B0] sm:w-44">
+                      {error.errorCode}
+                    </span>
+
+                    <span className="text-sm text-[#475569]">
+                      {error.errorMessage}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
       )}
 
       {isFormOpen && (

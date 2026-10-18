@@ -1,12 +1,18 @@
 import { useState } from "react";
-import { uploadSalesCsv } from "../../api/sales";
+import {
+  getUploadResult,
+  uploadSalesCsv,
+  type UploadResult,
+} from "../../api/sales";
 
 interface SalesCsvUploadProps {
   onUploadSuccess: () => Promise<void>;
+  onUploadResult: (result: UploadResult) => void;
 }
 
 export default function SalesCsvUpload({
   onUploadSuccess,
+  onUploadResult,
 }: SalesCsvUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState("");
@@ -28,10 +34,13 @@ export default function SalesCsvUpload({
     setMessage("");
 
     try {
-      await uploadSalesCsv(file);
+      const { batchId } = await uploadSalesCsv(file);
+      const result = await getUploadResult(batchId);
+
+      onUploadResult(result);
       await onUploadSuccess();
     } catch {
-      setMessage("CSV 업로드에 실패했습니다.");
+      setMessage("CSV 업로드 또는 결과 조회에 실패했습니다.");
     } finally {
       setIsUploading(false);
       event.target.value = "";
@@ -39,8 +48,8 @@ export default function SalesCsvUpload({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      <label className="cursor-pointer rounded-xl bg-[#EEF0FF] px-5 py-3 text-sm font-semibold text-[#6055D8]">
+    <div>
+      <label className="inline-flex cursor-pointer items-center rounded-xl bg-[#EEF0FF] px-5 py-3 text-sm font-semibold text-[#6055D8]">
         {isUploading ? "업로드 중..." : "CSV 업로드"}
 
         <input
@@ -53,7 +62,7 @@ export default function SalesCsvUpload({
       </label>
 
       {message && (
-        <p role="alert" className="text-sm text-red-500">
+        <p role="alert" className="mt-2 text-xs text-red-500">
           {message}
         </p>
       )}

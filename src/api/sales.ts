@@ -16,6 +16,28 @@ export interface CreateSaleRequest {
   paymentMethod: string;
 }
 
+export interface UploadResponse {
+  batchId: number;
+}
+
+export interface UploadErrorDetail {
+  rowNumber: number;
+  errorCode: string;
+  errorMessage: string;
+  rawData: string;
+}
+
+export interface UploadResult {
+  batchId: number;
+  fileName: string;
+  fileType: string;
+  uploadedAt: string;
+  totalRows: number;
+  successRows: number;
+  errorRows: number;
+  errors: UploadErrorDetail[];
+}
+
 export const getSales = async (): Promise<Sale[]> => {
   const response = await apiClient.get<Sale[]>("/api/sales");
 
@@ -28,20 +50,23 @@ export const createSale = async (data: CreateSaleRequest): Promise<Sale> => {
   return response.data;
 };
 
-export const uploadSalesCsv = async (file: File): Promise<string> => {
+export const uploadSalesCsv = async (file: File): Promise<UploadResponse> => {
   const formData = new FormData();
 
   formData.append("file", file);
 
-  const response = await apiClient.post<string>(
+  const response = await apiClient.post<UploadResponse>(
     "/api/uploads/sales",
     formData,
-    {
-      headers: {
-        "Content-Type": undefined,
-      },
-    },
   );
+
+  return response.data;
+};
+
+export const getUploadResult = async (
+  batchId: number,
+): Promise<UploadResult> => {
+  const response = await apiClient.get<UploadResult>(`/api/uploads/${batchId}`);
 
   return response.data;
 };
