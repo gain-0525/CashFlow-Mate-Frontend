@@ -3,6 +3,7 @@ import type { Sale, CreateSaleRequest } from "../../api/sales";
 
 interface SaleFormProps {
   initialData?: Sale;
+  defaultTransactionId?: string;
   onSubmit: (data: CreateSaleRequest) => Promise<void>;
   onCancel: () => void;
 }
@@ -11,10 +12,11 @@ export default function SaleForm({
   onSubmit,
   onCancel,
   initialData,
+  defaultTransactionId,
 }: SaleFormProps) {
   const isEditMode = !!initialData;
   const [transactionId, setTransactionId] = useState(
-    initialData?.transactionId ?? "",
+    initialData?.transactionId ?? defaultTransactionId ?? "",
   );
   const [saleDate, setSaleDate] = useState(initialData?.saleDate ?? "");
   const [amount, setAmount] = useState(
