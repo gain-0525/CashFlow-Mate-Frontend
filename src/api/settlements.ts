@@ -1,4 +1,5 @@
 import { apiClient } from "./client";
+import type { UploadResponse } from "./sales";
 
 export interface Settlement {
   id: number;
@@ -36,14 +37,17 @@ export const createSettlement = async (
   return response.data;
 };
 
-export const uploadSettlementsCsv = async (file: File): Promise<string> => {
+export const uploadSettlementsCsv = async (
+  file: File,
+): Promise<UploadResponse> => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const response = await apiClient.post<string>(
+  const response = await apiClient.post<UploadResponse>(
     "/api/uploads/settlements",
     formData,
   );
+
   return response.data;
 };
 
