@@ -1,0 +1,2 @@
+transaction_id,settlement_date,gross_amount,fee_amount,net_amount,status
+TXN_SAMPLE_001,2026-10-20,100000,3000,97000,SCHEDULED
