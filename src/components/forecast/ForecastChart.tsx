@@ -6,6 +6,8 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  ReferenceArea,
+  ReferenceLine,
 } from "recharts";
 
 import type { Forecast } from "../../api/forecast";
@@ -19,6 +21,12 @@ export default function ForecastChart({ forecasts }: Props) {
     ...item,
     dateLabel: item.date.slice(5),
   }));
+
+  // 예상 잔액의 최솟값
+  const minBalance = Math.min(
+    0,
+    ...forecasts.map((item) => item.projectedBalance),
+  );
 
   return (
     <div className="rounded-2xl border border-[#EDF0F8] bg-white p-6">
@@ -45,13 +53,48 @@ export default function ForecastChart({ forecasts }: Props) {
               formatter={(value) => `₩${Number(value).toLocaleString("ko-KR")}`}
             />
 
+            {minBalance < 0 && (
+              <ReferenceArea
+                y1={minBalance}
+                y2={0}
+                fill="#FEE2E2"
+                fillOpacity={0.5}
+                strokeOpacity={0}
+              />
+            )}
+
+            {/* 0원 기준 빨간 점선 */}
+            <ReferenceLine
+              y={0}
+              stroke="#EF4444"
+              strokeDasharray="5 5"
+              ifOverflow="extendDomain"
+            />
+
             <Line
               type="monotone"
               dataKey="projectedBalance"
               name="예상 잔액"
               stroke="#5675FF"
               strokeWidth={3}
-              dot={false}
+              dot={(props: any) => {
+                const { cx, cy, payload } = props;
+
+                if (payload.projectedBalance >= 0) {
+                  return <circle cx={cx} cy={cy} r={0} />;
+                }
+
+                return (
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={5}
+                    fill="#EF4444"
+                    stroke="#FFFFFF"
+                    strokeWidth={2}
+                  />
+                );
+              }}
               activeDot={{ r: 6 }}
             />
           </LineChart>
