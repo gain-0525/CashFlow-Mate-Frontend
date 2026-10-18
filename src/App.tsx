@@ -7,6 +7,7 @@ import SettlementsPage from "./pages/SettlementsPage";
 import ReconciliationPage from "./pages/ReconciliationPage";
 import ExpensesPage from "./pages/ExpensesPage";
 import ForecastPage from "./pages/ForecastPage";
+import GuidePage from "./pages/GuidePage";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
       <Routes>
         <Route element={<AppLayout />}>
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/guide" element={<GuidePage />} />
           <Route path="/sales" element={<SalesPage />} />
           <Route path="/settlements" element={<SettlementsPage />} />
           <Route path="/reconciliation" element={<ReconciliationPage />} />
