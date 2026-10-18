@@ -14,6 +14,9 @@ import {
   type CreateSettlementRequest,
 } from "../api/settlements";
 
+import { createSale, type CreateSaleRequest } from "../api/sales";
+
+import SaleForm from "../components/sales/SaleForm";
 import SettlementForm from "../components/settlements/SettlementForm";
 
 import ReconciliationSummary from "../components/reconciliation/ReconciliationSummary";
@@ -106,6 +109,15 @@ export default function ReconciliationPage() {
     data: CreateSettlementRequest,
   ) => {
     await createSettlement(data);
+
+    const updatedReconciliations = await getReconciliation();
+    setReconciliations(updatedReconciliations);
+
+    setSelectedReconciliation(null);
+  };
+
+  const handleCreateMissingSale = async (data: CreateSaleRequest) => {
+    await createSale(data);
 
     const updatedReconciliations = await getReconciliation();
     setReconciliations(updatedReconciliations);
@@ -234,6 +246,35 @@ export default function ReconciliationPage() {
                   }}
                 />
               )}
+            </div>
+          )}
+
+          {selectedReconciliation?.validationStatus === "MISSING_SALE" && (
+            <div className="rounded-2xl border border-[#DDE4FF] bg-[#F8FAFF] p-5">
+              <div className="mb-4">
+                <h2 className="text-lg font-bold text-[#17213B]">
+                  매출 누락 해결
+                </h2>
+
+                <p className="mt-1 text-sm text-[#8190B0]">
+                  거래 ID {selectedReconciliation.transactionId}에 해당하는 매출
+                  데이터를 등록해 주세요.
+                </p>
+
+                <p className="mt-1 text-sm text-[#8190B0]">
+                  기존 정산 기준액: ₩
+                  {selectedReconciliation.settlementAmount?.toLocaleString(
+                    "ko-KR",
+                  ) ?? "-"}
+                </p>
+              </div>
+
+              <SaleForm
+                key={selectedReconciliation.transactionId}
+                defaultTransactionId={selectedReconciliation.transactionId}
+                onSubmit={handleCreateMissingSale}
+                onCancel={() => setSelectedReconciliation(null)}
+              />
             </div>
           )}
 
