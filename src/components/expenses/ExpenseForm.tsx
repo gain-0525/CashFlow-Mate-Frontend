@@ -5,13 +5,22 @@ import type { CreateExpenseRequest } from "../../api/expenses";
 interface Props {
   onSubmit: (data: CreateExpenseRequest) => Promise<void>;
   onCancel: () => void;
+  initialData?: CreateExpenseRequest;
 }
 
-export default function ExpenseForm({ onSubmit, onCancel }: Props) {
-  const [title, setTitle] = useState("");
-  const [amount, setAmount] = useState("");
-  const [dueDate, setDueDate] = useState("");
-  const [status, setStatus] = useState("SCHEDULED");
+export default function ExpenseForm({
+  onSubmit,
+  onCancel,
+  initialData,
+}: Props) {
+  const isEditing = !!initialData;
+
+  const [title, setTitle] = useState(initialData?.title ?? "");
+  const [amount, setAmount] = useState(
+    initialData ? String(initialData.amount) : "",
+  );
+  const [dueDate, setDueDate] = useState(initialData?.dueDate ?? "");
+  const [status, setStatus] = useState(initialData?.status ?? "SCHEDULED");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -39,7 +48,9 @@ export default function ExpenseForm({ onSubmit, onCancel }: Props) {
         status,
       });
     } catch {
-      setError("지출 등록에 실패했습니다.");
+      setError(
+        isEditing ? "지출 수정에 실패했습니다." : "지출 등록에 실패했습니다.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -50,7 +61,9 @@ export default function ExpenseForm({ onSubmit, onCancel }: Props) {
       onSubmit={handleSubmit}
       className="space-y-5 rounded-2xl border border-[#EDF0F8] bg-white p-6"
     >
-      <h2 className="text-lg font-semibold text-[#17213B]">지출 등록</h2>
+      <h2 className="text-lg font-semibold text-[#17213B]">
+        {isEditing ? "지출 수정" : "지출 등록"}
+      </h2>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
@@ -118,7 +131,13 @@ export default function ExpenseForm({ onSubmit, onCancel }: Props) {
           disabled={isSubmitting}
           className="rounded-xl bg-[#5675FF] px-5 py-3 text-sm font-semibold text-white hover:bg-[#4564E8] disabled:opacity-50"
         >
-          {isSubmitting ? "등록 중..." : "등록하기"}
+          {isSubmitting
+            ? isEditing
+              ? "수정 중..."
+              : "등록 중..."
+            : isEditing
+              ? "수정하기"
+              : "등록하기"}
         </button>
       </div>
     </form>

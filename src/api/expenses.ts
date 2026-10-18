@@ -28,3 +28,15 @@ export const createExpense = async (
 
   return response.data;
 };
+
+export const updateExpense = async (
+  id: number,
+  data: CreateExpenseRequest,
+): Promise<Expense> => {
+  const response = await apiClient.put<Expense>(`/api/expenses/${id}`, data);
+  return response.data;
+};
+
+export const deleteExpense = async (id: number): Promise<void> => {
+  await apiClient.delete(`/api/expenses/${id}`);
+};

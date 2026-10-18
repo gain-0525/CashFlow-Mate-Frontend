@@ -5,6 +5,8 @@ import {
   type Expense,
   createExpense,
   type CreateExpenseRequest,
+  updateExpense,
+  deleteExpense,
 } from "../api/expenses";
 import ExpenseForm from "../components/expenses/ExpenseForm";
 
@@ -20,6 +22,8 @@ export default function ExpensesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("ALL");
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
+  const [actionError, setActionError] = useState("");
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -63,6 +67,34 @@ export default function ExpensesPage() {
     setExpenses(updatedExpenses);
 
     setIsFormOpen(false);
+  };
+
+  const handleUpdateExpense = async (data: CreateExpenseRequest) => {
+    if (!editingExpense) return;
+
+    await updateExpense(editingExpense.id, data);
+
+    const updateExpenses = await getExpenses();
+    setExpenses(updateExpenses);
+
+    setEditingExpense(null);
+  };
+
+  const handleDeleteExpense = async (id: number) => {
+    const confirmed = window.confirm("정말 이 지출 내역을 삭제하시겠습니까?");
+
+    if (!confirmed) return;
+
+    try {
+      setActionError("");
+
+      await deleteExpense(id);
+
+      const updatedExpenses = await getExpenses();
+      setExpenses(updatedExpenses);
+    } catch {
+      setActionError("지출 삭제에 실패했습니다.");
+    }
   };
 
   return (
@@ -113,7 +145,10 @@ export default function ExpensesPage() {
 
             <button
               type="button"
-              onClick={() => setIsFormOpen(true)}
+              onClick={() => {
+                setEditingExpense(null);
+                setIsFormOpen(true);
+              }}
               className="rounded-xl bg-[#5675FF] px-5 py-3 text-sm font-semibold text-white hover:bg-[#4564E8]"
             >
               지출 등록
@@ -142,10 +177,17 @@ export default function ExpensesPage() {
           </div>
 
           {/* 지출 등록 폼 */}
-          {isFormOpen && (
+          {(isFormOpen || editingExpense) && (
             <ExpenseForm
-              onSubmit={handleCreateExpense}
-              onCancel={() => setIsFormOpen(false)}
+              key={editingExpense?.id ?? "create"}
+              initialData={editingExpense ?? undefined}
+              onSubmit={
+                editingExpense ? handleUpdateExpense : handleCreateExpense
+              }
+              onCancel={() => {
+                setIsFormOpen(false);
+                setEditingExpense(null);
+              }}
             />
           )}
 
@@ -164,6 +206,7 @@ export default function ExpensesPage() {
                   <th className="px-6 py-4 text-right">금액</th>
                   <th className="px-6 py-4">지출 예정일</th>
                   <th className="px-6 py-4">상태</th>
+                  <th className="px-6 py-4 text-center">관리</th>
                 </tr>
               </thead>
 
@@ -180,10 +223,39 @@ export default function ExpensesPage() {
                         {statusLabels[expense.status] ?? expense.status}
                       </span>
                     </td>
+
+                    <td className="px-6 py-4">
+                      <div className="flex justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsFormOpen(false);
+                            setEditingExpense(expense);
+                          }}
+                          className="rounded-lg border border-[#DFE6FF] px-3 py-2 text-xs font-semibold text-[#5675FF] hover:bg-[#F8FAFF]"
+                        >
+                          수정
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteExpense(expense.id)}
+                          className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-500 hover:bg-red-50"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+
+            {actionError && (
+              <p role="alert" className="text-sm text-red-500">
+                {actionError}
+              </p>
+            )}
 
             {filteredExpenses.length === 0 && (
               <p className="p-8 text-center text-sm text-[#8190B0]">
