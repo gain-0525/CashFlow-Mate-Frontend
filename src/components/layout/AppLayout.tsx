@@ -10,6 +10,7 @@ import {
   Wallet,
   X,
   TrendingUp,
+  CalendarDays,
 } from "lucide-react";
 import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router";
@@ -25,6 +26,7 @@ const menus = [
   },
   { path: "/expenses", label: "지출 관리", icon: ReceiptText },
   { path: "/forecast", label: "현금흐름 예측", icon: TrendingUp },
+  { path: "/calendar", label: "자금 흐름 캘린더", icon: CalendarDays },
   { path: "/guide", label: "사용 가이드", icon: BookOpen },
 ];
 
@@ -36,6 +38,8 @@ const pageDescriptions: Record<string, string> = {
   "/reconciliation": "매출과 정산 데이터의 불일치 항목을 확인하세요.",
   "/expenses": "사업 운영에 필요한 지출을 관리하세요.",
   "/forecast": "예상 수입과 지출을 분석해 미래 잔액과 자금 위험을 확인하세요.",
+  "/calendar":
+    "날짜별 매출, 정산, 지출을 한눈에 확인하고 자금 흐름을 관리하세요.",
 };
 
 export default function AppLayout() {
