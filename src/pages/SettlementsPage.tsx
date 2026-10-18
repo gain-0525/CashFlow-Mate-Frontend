@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import {
   getSettlements,
   createSettlement,
+  updateSettlement,
+  deleteSettlement,
   type Settlement,
   type CreateSettlementRequest,
 } from "../api/settlements";
@@ -13,6 +15,7 @@ const validationLabels: Record<string, string> = {
   MATCHED: "일치",
   AMOUNT_MISMATCH: "금액 불일치",
   MISSING_SALE: "매출 누락",
+  INVALID_DATA: "정산 데이터 오류",
 };
 
 const statusLabels: Record<string, string> = {
@@ -27,6 +30,9 @@ export default function SettlementsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [uploadMessage, setUploadMessage] = useState("");
+  const [editingSettlement, setEditingSettlement] = useState<Settlement | null>(
+    null,
+  );
 
   useEffect(() => {
     const fetchSettlements = async () => {
@@ -73,6 +79,36 @@ export default function SettlementsPage() {
     setUploadMessage("정산 CSV가 업로드가 완료되었습니다.");
   };
 
+  const handleUpdateSettlement = async (data: CreateSettlementRequest) => {
+    if (!editingSettlement) return;
+
+    await updateSettlement(editingSettlement.id, data);
+
+    const updatedSettlements = await getSettlements();
+    setSettlements(updatedSettlements);
+
+    setEditingSettlement(null);
+    setIsFormOpen(false);
+  };
+
+  const handleDeleteSettlement = async (settlement: Settlement) => {
+    const isConfirmed = window.confirm(
+      `${settlement.transactionId} 정산 내역을 삭제하시겠습니까?`,
+    );
+
+    if (!isConfirmed) return;
+
+    try {
+      await deleteSettlement(settlement.id);
+
+      setSettlements((prev) =>
+        prev.filter((item) => item.id !== settlement.id),
+      );
+    } catch {
+      window.alert("정산 삭제에 실패했습니다.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-end gap-3">
@@ -83,7 +119,10 @@ export default function SettlementsPage() {
 
         <button
           type="button"
-          onClick={() => setIsFormOpen(true)}
+          onClick={() => {
+            setEditingSettlement(null);
+            setIsFormOpen(true);
+          }}
           className="rounded-xl bg-[#5675FF] px-5 py-3 text-sm font-semibold text-white hover:bg-[#4564E8]"
         >
           정산 등록
@@ -105,8 +144,15 @@ export default function SettlementsPage() {
 
       {isFormOpen && (
         <SettlementForm
-          onSubmit={handleCreateSettlement}
-          onCancel={() => setIsFormOpen(false)}
+          key={editingSettlement?.id ?? "create"}
+          initialData={editingSettlement ?? undefined}
+          onSubmit={
+            editingSettlement ? handleUpdateSettlement : handleCreateSettlement
+          }
+          onCancel={() => {
+            setIsFormOpen(false);
+            setEditingSettlement(null);
+          }}
         />
       )}
 
@@ -153,6 +199,7 @@ export default function SettlementsPage() {
                   <th className="px-6 py-4 text-right">실정산액</th>
                   <th className="px-6 py-4">정산 상태</th>
                   <th className="px-6 py-4">대조 결과</th>
+                  <th className="px-6 py-4 text-center">관리</th>
                 </tr>
               </thead>
 
@@ -186,6 +233,28 @@ export default function SettlementsPage() {
                         {validationLabels[settlement.validationStatus] ??
                           settlement.validationStatus}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingSettlement(settlement);
+                            setIsFormOpen(true);
+                          }}
+                          className="rounded-lg border border-[#DDE4F0] px-3 py-2 text-sm font-medium text-[#5675FF] hover:bg-[#F5F7FF]"
+                        >
+                          수정
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSettlement(settlement)}
+                          className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50"
+                        >
+                          삭제
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

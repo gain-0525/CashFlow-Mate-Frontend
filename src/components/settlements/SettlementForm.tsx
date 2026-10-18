@@ -1,22 +1,42 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 
-import type { CreateSettlementRequest } from "../../api/settlements";
+import type {
+  CreateSettlementRequest,
+  Settlement,
+} from "../../api/settlements";
 
 interface SettlementFormProps {
+  initialData?: Settlement;
   onSubmit: (data: CreateSettlementRequest) => Promise<void>;
   onCancel: () => void;
 }
 
 export default function SettlementForm({
+  initialData,
   onSubmit,
   onCancel,
 }: SettlementFormProps) {
-  const [transactionId, setTransactionId] = useState("");
-  const [settlementDate, setSettlementDate] = useState("");
-  const [grossAmount, setGrossAmount] = useState("");
-  const [feeAmount, setFeeAmount] = useState("");
-  const [status, setStatus] = useState("SCHEDULED");
+  const isEditMode = !!initialData;
+
+  const [transactionId, setTransactionId] = useState(
+    initialData?.transactionId ?? "",
+  );
+
+  const [settlementDate, setSettlementDate] = useState(
+    initialData?.settlementDate ?? "",
+  );
+
+  const [grossAmount, setGrossAmount] = useState(
+    initialData ? String(initialData.grossAmount) : "",
+  );
+
+  const [feeAmount, setFeeAmount] = useState(
+    initialData ? String(initialData.feeAmount) : "",
+  );
+
+  const [status, setStatus] = useState(initialData?.status ?? "SCHEDULED");
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -44,7 +64,9 @@ export default function SettlementForm({
         status,
       });
     } catch {
-      setError("정산 등록에 실패했습니다.");
+      setError(
+        isEditMode ? "정산 수정에 실패했습니다." : "정산 등록에 실패했습니다.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -58,7 +80,9 @@ export default function SettlementForm({
       onSubmit={handleSubmit}
       className="space-y-4 rounded-2xl border border-[#EDF0F8] bg-white p-6"
     >
-      <h2 className="text-lg font-semibold text-[#17213B]">정산 등록</h2>
+      <h2 className="text-lg font-semibold text-[#17213B]">
+        {isEditMode ? "정산 수정" : "정산 등록"}
+      </h2>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <label className="space-y-2 text-sm">
@@ -148,7 +172,13 @@ export default function SettlementForm({
           disabled={isSubmitting}
           className="rounded-xl bg-[#5675FF] px-5 py-3 text-sm font-semibold text-white disabled:opacity-50"
         >
-          {isSubmitting ? "등록 중..." : "정산 등록"}
+          {isSubmitting
+            ? isEditMode
+              ? "수정 중..."
+              : "등록 중..."
+            : isEditMode
+              ? "정산 수정"
+              : "정산 등록"}
         </button>
       </div>
     </form>

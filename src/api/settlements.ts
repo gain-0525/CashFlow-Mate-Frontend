@@ -46,3 +46,19 @@ export const uploadSettlementsCsv = async (file: File): Promise<string> => {
   );
   return response.data;
 };
+
+export const updateSettlement = async (
+  id: number,
+  data: CreateSettlementRequest,
+): Promise<Settlement> => {
+  const response = await apiClient.put<Settlement>(
+    `/api/settlements/${id}`,
+    data,
+  );
+
+  return response.data;
+};
+
+export const deleteSettlement = async (id: number): Promise<void> => {
+  await apiClient.delete(`/api/settlements/${id}`);
+};
