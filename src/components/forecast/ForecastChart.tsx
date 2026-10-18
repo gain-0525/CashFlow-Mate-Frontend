@@ -16,6 +16,12 @@ interface Props {
   forecasts: Forecast[];
 }
 
+type DotProps = {
+  cx?: number;
+  cy?: number;
+  payload: Forecast;
+};
+
 export default function ForecastChart({ forecasts }: Props) {
   const chartData = forecasts.map((item) => ({
     ...item,
@@ -77,7 +83,7 @@ export default function ForecastChart({ forecasts }: Props) {
               name="예상 잔액"
               stroke="#5675FF"
               strokeWidth={3}
-              dot={(props: any) => {
+              dot={(props: DotProps) => {
                 const { cx, cy, payload } = props;
 
                 if (payload.projectedBalance >= 0) {
