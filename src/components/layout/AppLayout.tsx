@@ -1,5 +1,6 @@
 import {
   BarChart3,
+  BookOpen,
   Bell,
   ClipboardList,
   FileCheck2,
@@ -24,10 +25,12 @@ const menus = [
   },
   { path: "/expenses", label: "지출 관리", icon: ReceiptText },
   { path: "/forecast", label: "현금흐름 예측", icon: TrendingUp },
+  { path: "/guide", label: "사용 가이드", icon: BookOpen },
 ];
 
 const pageDescriptions: Record<string, string> = {
   "/": "매출과 정산 데이터를 한눈에 확인하고, 앞으로의 현금흐름을 준비하세요.",
+  "/guide": "CashFlow Mate의 주요 기능과 이용 방법을 알아보세요.",
   "/sales": "매출 내역을 조회하고 데이터를 관리하세요.",
   "/settlements": "정산 내역과 수수료를 확인하세요.",
   "/reconciliation": "매출과 정산 데이터의 불일치 항목을 확인하세요.",
