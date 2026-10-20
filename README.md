@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="../CashFlow-Mate-Frontend/src//assets/cashflow-mate-banner.png" alt="CashFlow Mate — 소상공인 현금흐름 관리 서비스" width="100%" />
+<img src="../CashFlow-Mate-Frontend/src/assets/cashflow-mate-banner.png" alt="CashFlow Mate — 소상공인 현금흐름 관리 서비스" width="100%" />
 
 # CashFlow Mate 💸
 
