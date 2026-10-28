@@ -122,6 +122,9 @@ export default function SaleForm({
           className="w-full rounded-xl border p-3"
         >
           <option value="CARD">카드</option>
+          <option value="CASH">현금</option>
+          <option value="BANK_TRANSFER">계좌이체</option>
+          <option value="EASY_PAY">간편결제</option>
         </select>
       </div>
 
