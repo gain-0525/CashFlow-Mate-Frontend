@@ -129,73 +129,101 @@ export default function CashFlowCalendarPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-7 gap-2">
-          {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
-            <div
-              key={day}
-              className="py-2 text-center text-sm font-medium text-[#8190B0]"
-            >
-              {day}
-            </div>
-          ))}
-
-          {dates.map((day, index) => {
-            const dateKey =
-              day === null
-                ? null
-                : `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-
-            const isSelected = dateKey === selectedDate;
-            const dailyAmounts = dateKey ? getDailyAmounts(dateKey) : null;
-
-            return (
-              <button
-                key={dateKey ?? `empty-${index}`}
-                type="button"
-                disabled={day === null}
-                onClick={() => dateKey && setSelectedDate(dateKey)}
-                className={`flex min-h-32 flex-col items-start justify-start rounded-xl border p-3 text-left transition-colors ${
-                  isSelected
-                    ? "border-[#5675FF] bg-[#F0F3FF]"
-                    : "border-[#EDF0F8] hover:bg-[#F8FAFF]"
-                }`}
+        <div className="overflow-x-auto">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
+            {["일", "월", "화", "수", "목", "금", "토"].map((day) => (
+              <div
+                key={day}
+                className="py-2 text-center text-sm font-medium text-[#8190B0]"
               >
-                {day !== null && (
-                  <div className="space-y-2">
-                    <span className="text-sm font-medium text-[#17213B]">
-                      {day}
-                    </span>
+                {day}
+              </div>
+            ))}
 
-                    <div className="space-y-1.5">
-                      {dailyAmounts && dailyAmounts.salesAmount > 0 && (
-                        <div className="rounded-md bg-[#E9EEFF] px-2 py-1.5 text-xs font-medium text-[#3156D3]">
-                          매출{" "}
-                          {dailyAmounts.salesAmount.toLocaleString("ko-KR")}원
-                        </div>
-                      )}
+            {dates.map((day, index) => {
+              const dateKey =
+                day === null
+                  ? null
+                  : `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
-                      {dailyAmounts && dailyAmounts.settlementAmount > 0 && (
-                        <div className="rounded-md bg-[#DCFCE7] px-2 py-1.5 text-xs font-medium text-[#15803D]">
-                          정산{" "}
-                          {dailyAmounts.settlementAmount.toLocaleString(
-                            "ko-KR",
-                          )}
-                          원
-                        </div>
-                      )}
+              const isSelected = dateKey === selectedDate;
+              const dailyAmounts = dateKey ? getDailyAmounts(dateKey) : null;
 
-                      {dailyAmounts && dailyAmounts.expenseAmount > 0 && (
-                        <div className="rounded-md bg-[#FEE2E2] px-2 py-1.5 text-xs font-medium text-[#B91C1C]">
-                          지출{" "}
-                          {dailyAmounts.expenseAmount.toLocaleString("ko-KR")}원
-                        </div>
-                      )}
+              return (
+                <button
+                  key={dateKey ?? `empty-${index}`}
+                  type="button"
+                  disabled={day === null}
+                  onClick={() => dateKey && setSelectedDate(dateKey)}
+                  className={`flex min-h-16 min-w-0 flex-col items-center justify-start rounded-lg border p-1 text-center transition-colors sm:min-h-32 sm:items-start sm:rounded-xl sm:p-3 sm:text-left ${
+                    isSelected
+                      ? "border-[#5675FF] bg-[#F0F3FF]"
+                      : "border-[#EDF0F8] hover:bg-[#F8FAFF]"
+                  }`}
+                >
+                  {day !== null && (
+                    <div className="space-y-2">
+                      <span className="text-sm font-medium text-[#17213B]">
+                        {day}
+                      </span>
+
+                      {/* 모바일: 금액 대신 색깔 점 표시 */}
+                      <div className="mt-2 flex flex-wrap justify-center gap-1 sm:hidden">
+                        {dailyAmounts && dailyAmounts.salesAmount > 0 && (
+                          <span
+                            className="h-1.5 w-1.5 rounded-full bg-blue-500"
+                            title="매출"
+                          />
+                        )}
+
+                        {dailyAmounts && dailyAmounts.settlementAmount > 0 && (
+                          <span
+                            className="h-1.5 w-1.5 rounded-full bg-green-500"
+                            title="정산"
+                          />
+                        )}
+
+                        {dailyAmounts && dailyAmounts.expenseAmount > 0 && (
+                          <span
+                            className="h-1.5 w-1.5 rounded-full bg-red-500"
+                            title="지출"
+                          />
+                        )}
+                      </div>
+
+                      {/* PC: 기존처럼 금액 표시 */}
+                      <div className="hidden space-y-1.5 sm:block">
+                        {dailyAmounts && dailyAmounts.salesAmount > 0 && (
+                          <div className="whitespace-nowrap rounded-md bg-[#E9EEFF] px-2 py-1.5 text-xs font-medium text-[#3156D3]">
+                            매출{" "}
+                            {dailyAmounts.salesAmount.toLocaleString("ko-KR")}원
+                          </div>
+                        )}
+
+                        {dailyAmounts && dailyAmounts.settlementAmount > 0 && (
+                          <div className="whitespace-nowrap rounded-md bg-[#DCFCE7] px-2 py-1.5 text-xs font-medium text-[#15803D]">
+                            정산{" "}
+                            {dailyAmounts.settlementAmount.toLocaleString(
+                              "ko-KR",
+                            )}
+                            원
+                          </div>
+                        )}
+
+                        {dailyAmounts && dailyAmounts.expenseAmount > 0 && (
+                          <div className="whitespace-nowrap rounded-md bg-[#FEE2E2] px-2 py-1.5 text-xs font-medium text-[#B91C1C]">
+                            지출{" "}
+                            {dailyAmounts.expenseAmount.toLocaleString("ko-KR")}
+                            원
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </button>
-            );
-          })}
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -252,7 +280,7 @@ export default function CashFlowCalendarPage() {
               selectedSales.map((sale) => (
                 <div
                   key={sale.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-[#EDF0F8] p-4"
+                  className="flex flex-col gap-3 rounded-xl border border-[#EDF0F8] p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="text-sm font-medium text-[#17213B]">
@@ -285,7 +313,7 @@ export default function CashFlowCalendarPage() {
               selectedSettlements.map((settlement) => (
                 <div
                   key={settlement.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-[#EDF0F8] p-4"
+                  className="flex flex-col gap-3 rounded-xl border border-[#EDF0F8] p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="text-sm font-medium text-[#17213B]">
@@ -322,7 +350,7 @@ export default function CashFlowCalendarPage() {
               selectedExpenses.map((expense) => (
                 <div
                   key={expense.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-[#EDF0F8] p-4"
+                  className="flex flex-col gap-3 rounded-xl border border-[#EDF0F8] p-4 sm:flex-row sm:items-center sm:justify-between"
                 >
                   <div>
                     <p className="text-sm font-medium text-[#17213B]">
