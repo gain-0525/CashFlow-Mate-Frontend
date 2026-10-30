@@ -199,7 +199,7 @@ export default function ExpensesPage() {
               </h2>
             </div>
 
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[650px] text-left text-sm">
               <thead className="bg-[#F8FAFF] text-[#8190B0]">
                 <tr>
                   <th className="px-6 py-4">지출 항목</th>
@@ -218,21 +218,29 @@ export default function ExpensesPage() {
                       ₩{expense.amount.toLocaleString("ko-KR")}
                     </td>
                     <td className="px-6 py-4">{expense.dueDate}</td>
-                    <td className="px-6 py-4">
-                      <span className="rounded-md bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <span
+                        className={`inline-flex items-center rounded-md px-3 py-1 text-xs font-semibold whitespace-nowrap ${
+                          expense.status === "SCHEDULED"
+                            ? "bg-orange-50 text-orange-600"
+                            : expense.status === "COMPLETED"
+                              ? "bg-green-50 text-green-700"
+                              : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
                         {statusLabels[expense.status] ?? expense.status}
                       </span>
                     </td>
 
-                    <td className="px-6 py-4">
-                      <div className="flex justify-center gap-2">
+                    <td className="whitespace-nowrap px-6 py-4">
+                      <div className="flex min-w-max flex-nowrap justify-center gap-2">
                         <button
                           type="button"
                           onClick={() => {
                             setIsFormOpen(false);
                             setEditingExpense(expense);
                           }}
-                          className="rounded-lg border border-[#DFE6FF] px-3 py-2 text-xs font-semibold text-[#5675FF] hover:bg-[#F8FAFF]"
+                          className="whitespace-nowrap rounded-lg border border-[#DFE6FF] px-3 py-2 text-xs font-semibold text-[#5675FF] hover:bg-[#F8FAFF]"
                         >
                           수정
                         </button>
@@ -240,7 +248,7 @@ export default function ExpensesPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteExpense(expense.id)}
-                          className="rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-500 hover:bg-red-50"
+                          className="whitespace-nowrap rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-500 hover:bg-red-50"
                         >
                           삭제
                         </button>

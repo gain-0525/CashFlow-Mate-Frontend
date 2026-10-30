@@ -321,9 +321,9 @@ export default function SettlementsPage() {
                     <td className="px-6 py-4">
                       {statusLabels[settlement.status] ?? settlement.status}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="whitespace-nowrap px-6 py-4">
                       <span
-                        className={`rounded-md px-3 py-1 text-xs font-semibold ${
+                        className={`inline-flex w-max shrink-0 items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-xs font-semibold ${
                           settlement.validationStatus === "MATCHED"
                             ? "bg-green-50 text-green-700"
                             : "bg-red-50 text-red-600"
@@ -333,15 +333,15 @@ export default function SettlementsPage() {
                           settlement.validationStatus}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center gap-2">
+                    <td className="whitespace-nowrap px-6 py-4 text-center">
+                      <div className="flex min-w-max flex-nowrap items-center justify-center gap-2">
                         <button
                           type="button"
                           onClick={() => {
                             setEditingSettlement(settlement);
                             setIsFormOpen(true);
                           }}
-                          className="rounded-lg border border-[#DDE4F0] px-3 py-2 text-sm font-medium text-[#5675FF] hover:bg-[#F5F7FF]"
+                          className="shrink-0 whitespace-nowrap rounded-lg border border-[#DDE4F0] px-3 py-2 text-sm font-medium text-[#5675FF] hover:bg-[#F5F7FF]"
                         >
                           수정
                         </button>
@@ -349,7 +349,7 @@ export default function SettlementsPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteSettlement(settlement)}
-                          className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50"
+                          className="shrink-0 whitespace-nowrap rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50"
                         >
                           삭제
                         </button>

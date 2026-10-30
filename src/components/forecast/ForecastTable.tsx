@@ -27,7 +27,7 @@ export default function ForecastTable({ forecasts }: Props) {
         </h2>
       </div>
 
-      <table className="w-full text-left text-sm">
+      <table className="w-full min-w-[800px] whitespace-nowrap text-left text-sm">
         <thead className="bg-[#F8FAFF] text-[#8190B0]">
           <tr>
             <th className="px-6 py-4">날짜</th>
@@ -55,9 +55,9 @@ export default function ForecastTable({ forecasts }: Props) {
                 {formatAmount(item.projectedBalance)}
               </td>
 
-              <td className="px-6 py-4">
+              <td className="whitespace-nowrap px-6 py-4">
                 <span
-                  className={`rounded-md px-3 py-1 text-xs font-semibold ${
+                  className={`inline-flex w-max items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-xs font-semibold ${
                     riskStyles[item.riskLevel] ?? "bg-gray-100 text-gray-700"
                   }`}
                 >

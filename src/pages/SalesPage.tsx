@@ -230,7 +230,7 @@ export default function SalesPage() {
                 className="w-64 max-w-full rounded-xl border border-[#E2E8F0] bg-white px-4 py-3 text-sm outline-none focus:border-[#5675FF]"
               />
             </div>
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[800px] whitespace-nowrap text-left text-sm">
               <thead className="bg-[#F8FAFF] text-[#8190B0]">
                 <tr>
                   <th className="px-6 py-4">거래 ID</th>
@@ -251,15 +251,15 @@ export default function SalesPage() {
                       ₩{sale.amount.toLocaleString("ko-KR")}
                     </td>
 
-                    <td className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center gap-2">
+                    <td className="whitespace-nowrap px-6 py-4 text-center">
+                      <div className="flex min-w-max flex-nowrap items-center justify-center gap-2">
                         <button
                           type="button"
                           onClick={() => {
                             setEditingSale(sale);
                             setIsFormOpen(true);
                           }}
-                          className="rounded-lg border border-[#DDE4F0] px-3 py-2 text-sm font-medium text-[#5675FF] hover:bg-[#F5F7FF]"
+                          className="shrink-0 whitespace-nowrap rounded-lg border border-[#DDE4F0] px-3 py-2 text-sm font-medium text-[#5675FF] hover:bg-[#F5F7FF]"
                         >
                           수정
                         </button>
@@ -267,7 +267,7 @@ export default function SalesPage() {
                         <button
                           type="button"
                           onClick={() => handleDeleteSale(sale)}
-                          className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50"
+                          className="shrink-0 whitespace-nowrap rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-500 hover:bg-red-50"
                         >
                           삭제
                         </button>
